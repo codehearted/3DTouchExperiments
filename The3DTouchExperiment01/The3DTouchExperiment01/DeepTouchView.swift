@@ -53,8 +53,8 @@ class DeepTouchView: UIView {
             var forceMultiplier : CGFloat = 1.0
             
             forceMultiplier = t.force
-            let stdHeight : CGFloat = 80.0 * forceMultiplier
-            let stdWidth : CGFloat = 80.0 * forceMultiplier
+            let stdHeight : CGFloat = 120.0 * forceMultiplier
+            let stdWidth : CGFloat = 120.0 * forceMultiplier
            
             let tLoc = t.locationInView(self)
             let rectCenterX : CGFloat = tLoc.x
@@ -64,12 +64,26 @@ class DeepTouchView: UIView {
 
             CGContextAddEllipseInRect(context, rectangle);
             
+            if t.force < 0.1 {
+                CGContextSetStrokeColorWithColor(context,
+                    UIColor.greenColor().CGColor);
+            } else if t.force > 0.95 && t.force < 1.05 {
+                CGContextSetStrokeColorWithColor(context,
+                    UIColor.orangeColor().CGColor);
+            }
             if t.force < 0.5 {
                 CGContextAddRect(context, CGRectCenteredAt(rectCenterX, y: rectCenterY, w: 2.0, h: 150.0 * (0.6 / forceMultiplier)))
                 
                 CGContextAddRect(context, CGRectCenteredAt(rectCenterX, y: rectCenterY, w: 150.0 * (0.6 / forceMultiplier), h: 2.0))
             } else if t.force == t.maximumPossibleForce {
                 CGContextFillEllipseInRect(context, rectangle)
+            }
+            if self.touches.count > 1{
+                for i in 2...self.touches.count {
+                    let multiRect = CGRectApplyAffineTransform(rectangle, CGAffineTransformTranslate(CGAffineTransformMakeScale(1.2, 1.2), CGFloat(i)*35.0, 0))
+                    CGContextSetFillColorWithColor(context, UIColor(hue: CGFloat(i)*0.18, saturation: 0.11*t.force, brightness:0.75+t.force*4.0, alpha: 0.5).CGColor)
+                    CGContextFillEllipseInRect(context, multiRect)
+                }
             }
             CGContextStrokePath(context);
         }
